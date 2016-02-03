@@ -56,21 +56,269 @@ public class Breakout extends GraphicsProgram {
 
 	/** Number of turns */
 	private static final int NTURNS = 3;
+	
+	private static final int NBricks=100;
+	
+	private GRect paddle;
+	
+	private double vX;
+	private double vY=+3.0;	
+	
+	private RandomGenerator rgen= new RandomGenerator();
+	
+	private double DELAY=6;
+	
+	private GOval Ball;
+	
+	private GLabel LabelA;
+	
+	private GLabel LabelB;
+	
+	private GObject collider;
+	
+	private int NTurnsLeft=NTURNS;
+	
+	private int NBricksLeft=NBricks;
+	
+	private GLabel Label_Win;
+	
+	private GLabel Label_Lose;
+	
+	
+	
 
 	public void run() {
 		/* You fill this in, along with any subsidiary methods */
 		Setup();
+		CreatePaddle();
 		
+		
+		addMouseListeners();
+		
+		
+			BouncingBall();
+		
+				
 	}
 	
 	private void Setup(){
 		
 		for(int i=0;i<NBRICK_ROWS;i++){
-			for(int j=0;j<NBRICKS_PER_ROW;i++){
-				add(newGRect())
-				
+			for(int j=0;j<NBRICKS_PER_ROW;j++){
+				GRect brick=new GRect((j*(BRICK_WIDTH+BRICK_SEP)),(BRICK_Y_OFFSET+i*(BRICK_HEIGHT+BRICK_SEP)),BRICK_WIDTH,BRICK_HEIGHT);
+				brick.setFilled(true);
+				switch(i){
+				case 0: brick.setFillColor(Color.red );
+						break;
+				case 1: brick.setFillColor(Color.red );
+						break;	
+				case 2: brick.setFillColor(Color.orange );
+						break;	
+				case 3: brick.setFillColor(Color.orange );
+						break;
+				case 4: brick.setFillColor(Color.yellow);
+						break;
+				case 5: brick.setFillColor(Color.yellow);
+						break;
+				case 6: brick.setFillColor(Color.green);
+						break;		
+				case 7: brick.setFillColor(Color.green);
+						break;	
+				case 8: brick.setFillColor(Color.cyan);
+						break;		
+				case 9: brick.setFillColor(Color.cyan);
+						break;		
+				default:
+						
+					
+				}
+				add(brick);
 			}
 		}
 		
 	}
+	
+	private void CreatePaddle(){
+		paddle=new GRect((getWidth()-PADDLE_WIDTH)/2,(getHeight()-PADDLE_Y_OFFSET-PADDLE_HEIGHT),PADDLE_WIDTH,PADDLE_HEIGHT);
+		paddle.setFilled(true);
+		paddle.setFillColor(Color.black );
+		add(paddle);
+		
+		
+		
+		
+	}
+	
+	 public void mouseMoved(MouseEvent e){
+		 if(e.getX()>PADDLE_WIDTH/2 && (e.getX()+PADDLE_WIDTH/2)<getWidth()){
+			 paddle.setLocation((e.getX()-PADDLE_WIDTH/2),(getHeight()-PADDLE_Y_OFFSET-PADDLE_HEIGHT));
+		 }
+	
+	 }
+	 
+	 private void BouncingBall(){
+		   createBall();
+		    vX=rgen.nextDouble(1.0,3.0);
+			 if(rgen.nextBoolean(0.5)) vX=-vX;
+			 
+			 labelsSetting();
+			 
+           	 
+		   while(NTurnsLeft>0){
+			   
+			   moveball();
+			   checkCollision();
+			   
+			   if(NBricksLeft==0) {
+				   add(Label_Win);
+				   break;
+			   }
+			   pause(DELAY);
+			   
+			   
+			   
+			   
+			   
+			   
+		   }
+		   if(NTurnsLeft<=0){
+		   add(Label_Lose);
+		   }
+		 
+	 }
+	 
+	 private void labelsSetting(){
+		 LabelA=new GLabel(NTurnsLeft+" ",50,50);
+		 add(LabelA);
+		 LabelB=new GLabel(NBricksLeft+" ",100,50);
+		 add(LabelB);
+		 
+		 Label_Win=new GLabel ("You WINNNNN",getWidth()/2,getHeight()/2);
+		 Label_Win.setFont("serif");
+		 Label_Lose=new GLabel ("Suckerrrrrrr",getWidth()/2,getHeight()/2);
+		 
+	 }
+	 private void createBall(){
+		 Ball= new GOval(getWidth()/2-BALL_RADIUS,getHeight()/2-BALL_RADIUS,BALL_RADIUS*2,BALL_RADIUS*2);
+		 Ball.setFilled(true);
+		 Ball.setFillColor(Color.GRAY);
+		 add(Ball);
+		 
+	 }
+	 
+	 private void moveball(){
+
+		 
+		 
+		 Ball.move(vX, vY);
+		 
+	 }
+	 
+	 
+	 /* optimizing ....Using GPoint class to write a  single switch  statement */
+	 
+	 private void  re_init_ball(){
+		 vX=rgen.nextDouble(1.0,3.0);
+		 if(rgen.nextBoolean(0.5)) vX=-vX;
+		 
+	 }
+	 private void checkCollision(){
+		 
+		 checkCollision_Bound();
+		 checkCollision_Object();
+		 
+		 
+	 }
+	 private void checkCollision_Bound(){
+		 
+		 double ball_R_Edge=Ball.getX()+2*BALL_RADIUS;
+		 double ball_L_Edge=Ball.getX();
+		 double ball_Bottom=Ball.getY()+2*BALL_RADIUS;
+		 double ball_Top=Ball.getY();	 
+		 if(ball_R_Edge>getWidth()){
+			 vX=-vX;
+		 }
+		 else if (ball_R_Edge<0){
+			 vX=-vX;
+			 
+		 }
+		 else if ( ball_Bottom>getHeight()){
+			
+			 reservingBall();
+			 NTurnsLeft--;
+			 LabelA.setLabel(NTurnsLeft+"");
+			 
+		 }
+		 else if(ball_Top<0){
+			 vY=-vY;
+		 }
+	 }
+	 
+	 private void reservingBall(){
+		 
+		 
+		 waitForClick();
+		 Ball.setLocation(getWidth()/2-BALL_RADIUS,getHeight()/2-BALL_RADIUS);
+		 re_init_ball();
+		 
+	 }
+	 private void checkCollision_Object(){
+		 collider=getCollidingObject();
+		 if(collider==paddle){
+			 vY=-vY;
+		 }
+		 
+		 else if (collider==null){
+			 
+		 }
+		 else if (collider==Label_Win){
+			 
+		 }
+		 else if (collider==Label_Lose){
+			 
+		 }
+		 else if (collider==LabelA){
+			 
+		 }
+		 else if (collider==LabelB){
+			 
+		 }
+		 
+		 else{
+			 vY=-vY;
+			 remove(collider);
+			 NBricksLeft--;
+			 LabelB.setLabel(NBricksLeft+"");
+			 
+		 }
+		
+		 
+	 }
+	 
+	 private GObject getCollidingObject(){
+		 GPoint LeftTopCorner=new GPoint(Ball.getX(),Ball.getY());
+		 GPoint RightTopCorner=new GPoint(Ball.getX()+2*BALL_RADIUS,Ball.getY());
+		 GPoint LeftBottomCorner=new GPoint(Ball.getX(),Ball.getY()+2*BALL_RADIUS);
+		 GPoint RightBottomCorner=new GPoint(Ball.getX()+2*BALL_RADIUS,Ball.getY()+2*BALL_RADIUS);
+		 
+		 if(getElementAt(LeftTopCorner)!=null){
+			 return getElementAt(LeftTopCorner);
+		 }
+		 else if (getElementAt(RightTopCorner)!=null){
+			 return getElementAt(RightTopCorner);
+		 }
+		 else if (getElementAt(LeftBottomCorner)!=null){
+			 return getElementAt(LeftBottomCorner);
+		 }
+		 else if (getElementAt(RightBottomCorner)!=null){
+			 return getElementAt(RightBottomCorner);
+		 }
+		 
+		 else return null;
+		 
+		 
+		 	
+	 }
+	
 }
+
