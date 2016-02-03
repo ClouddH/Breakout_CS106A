@@ -70,9 +70,9 @@ public class Breakout extends GraphicsProgram {
 	
 	private GOval Ball;
 	
-	private GLabel LabelA;
+	private GLabel LabelTurnsRemaining;
 	
-	private GLabel LabelB;
+	private GLabel LabelBricksRemaining;
 	
 	private GObject collider;
 	
@@ -91,14 +91,8 @@ public class Breakout extends GraphicsProgram {
 		/* You fill this in, along with any subsidiary methods */
 		Setup();
 		CreatePaddle();
-		
-		
 		addMouseListeners();
-		
-		
-			BouncingBall();
-		
-				
+		BouncingBall();				
 	}
 	
 	private void Setup(){
@@ -128,9 +122,7 @@ public class Breakout extends GraphicsProgram {
 						break;		
 				case 9: brick.setFillColor(Color.cyan);
 						break;		
-				default:
-						
-					
+				default:	
 				}
 				add(brick);
 			}
@@ -142,11 +134,7 @@ public class Breakout extends GraphicsProgram {
 		paddle=new GRect((getWidth()-PADDLE_WIDTH)/2,(getHeight()-PADDLE_Y_OFFSET-PADDLE_HEIGHT),PADDLE_WIDTH,PADDLE_HEIGHT);
 		paddle.setFilled(true);
 		paddle.setFillColor(Color.black );
-		add(paddle);
-		
-		
-		
-		
+		add(paddle);		
 	}
 	
 	 public void mouseMoved(MouseEvent e){
@@ -158,28 +146,17 @@ public class Breakout extends GraphicsProgram {
 	 
 	 private void BouncingBall(){
 		   createBall();
-		    vX=rgen.nextDouble(1.0,3.0);
+		   vX=rgen.nextDouble(1.0,3.0);
 			 if(rgen.nextBoolean(0.5)) vX=-vX;
-			 
-			 labelsSetting();
-			 
-           	 
+		   labelsSetting();
 		   while(NTurnsLeft>0){
-			   
 			   moveball();
 			   checkCollision();
-			   
 			   if(NBricksLeft==0) {
 				   add(Label_Win);
 				   break;
 			   }
-			   pause(DELAY);
-			   
-			   
-			   
-			   
-			   
-			   
+			   pause(DELAY);		   	   
 		   }
 		   if(NTurnsLeft<=0){
 		   add(Label_Lose);
@@ -188,11 +165,10 @@ public class Breakout extends GraphicsProgram {
 	 }
 	 
 	 private void labelsSetting(){
-		 LabelA=new GLabel(NTurnsLeft+" ",50,50);
-		 add(LabelA);
-		 LabelB=new GLabel(NBricksLeft+" ",100,50);
-		 add(LabelB);
-		 
+		 LabelTurnsRemaining=new GLabel(NTurnsLeft+" ",50,50);
+		 add(LabelTurnsRemaining);
+		 LabelBricksRemaining=new GLabel(NBricksLeft+" ",100,50);
+		 add(LabelBricksRemaining);
 		 Label_Win=new GLabel ("You WINNNNN",getWidth()/2,getHeight()/2);
 		 Label_Win.setFont("serif");
 		 Label_Lose=new GLabel ("Suckerrrrrrr",getWidth()/2,getHeight()/2);
@@ -207,26 +183,17 @@ public class Breakout extends GraphicsProgram {
 	 }
 	 
 	 private void moveball(){
-
-		 
-		 
 		 Ball.move(vX, vY);
 		 
 	 }
 	 
-	 
-	 /* optimizing ....Using GPoint class to write a  single switch  statement */
-	 
 	 private void  re_init_ball(){
 		 vX=rgen.nextDouble(1.0,3.0);
-		 if(rgen.nextBoolean(0.5)) vX=-vX;
-		 
+		 if(rgen.nextBoolean(0.5)) vX=-vX;	 
 	 }
 	 private void checkCollision(){
-		 
 		 checkCollision_Bound();
-		 checkCollision_Object();
-		 
+		 checkCollision_Object(); 
 		 
 	 }
 	 private void checkCollision_Bound(){
@@ -244,9 +211,9 @@ public class Breakout extends GraphicsProgram {
 		 }
 		 else if ( ball_Bottom>getHeight()){
 			
-			 reservingBall();
+			 reServingBall();
 			 NTurnsLeft--;
-			 LabelA.setLabel(NTurnsLeft+"");
+			 LabelTurnsRemaining.setLabel(NTurnsLeft+"");
 			 
 		 }
 		 else if(ball_Top<0){
@@ -254,7 +221,7 @@ public class Breakout extends GraphicsProgram {
 		 }
 	 }
 	 
-	 private void reservingBall(){
+	 private void reServingBall(){
 		 
 		 
 		 waitForClick();
@@ -268,27 +235,16 @@ public class Breakout extends GraphicsProgram {
 			 vY=-vY;
 		 }
 		 
-		 else if (collider==null){
-			 
+		 else if (collider==null || collider==Label_Win || collider==Label_Lose
+				 || collider==LabelTurnsRemaining || collider==LabelBricksRemaining){	 
 		 }
-		 else if (collider==Label_Win){
-			 
-		 }
-		 else if (collider==Label_Lose){
-			 
-		 }
-		 else if (collider==LabelA){
-			 
-		 }
-		 else if (collider==LabelB){
-			 
-		 }
+		
 		 
 		 else{
 			 vY=-vY;
 			 remove(collider);
 			 NBricksLeft--;
-			 LabelB.setLabel(NBricksLeft+"");
+			 LabelBricksRemaining.setLabel(NBricksLeft+"");
 			 
 		 }
 		
@@ -314,10 +270,7 @@ public class Breakout extends GraphicsProgram {
 			 return getElementAt(RightBottomCorner);
 		 }
 		 
-		 else return null;
-		 
-		 
-		 	
+		 else return null;	
 	 }
 	
 }
