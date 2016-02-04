@@ -6,3 +6,8 @@ Project specification : http://web.stanford.edu/class/cs106a/handouts/21-Assignm
 
 Official demo available at  http://web.stanford.edu/class/cs106a/    
 
+
+My notes :
+
+This is my first medium-sized project beyond the HELLO WORLD difficulty level .  In this assignment ,I practiced with top-down decomposition.
+
